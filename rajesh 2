@@ -1,0 +1,39 @@
+#include <iostream>
+#include <GSM.h>
+
+#define VIBRATION_SENSOR_PIN 2 // Example pin for vibration sensor
+#define GSM_TX_PIN 3           // Example TX pin for GSM module
+#define GSM_RX_PIN 4           // Example RX pin for GSM module
+
+GSM gsmAccess;
+GSM_SMS sms;
+
+void setup() {
+  pinMode(VIBRATION_SENSOR_PIN, INPUT);
+  Serial.begin(9600);
+  Serial.println("Starting");
+  if (gsmAccess.begin(GSM_TX_PIN, GSM_RX_PIN) == GSM_READY) {
+    Serial.println("GSM initialized");
+  } 
+  else {
+    Serial.println("GSM initialization failed");
+  }
+}
+void loop() {
+  int vibrationValue = digitalRead(VIBRATION_SENSOR_PIN);
+  if (vibrationValue == HIGH) 
+  {
+    sendAlertMessage();
+    delay(3000); // Delay to prevent sending multiple alerts in a short time
+  }
+}
+void sendAlertMessage() 
+{
+  Serial.println("Sending alert message...");
+  char remoteNum[] = "PHONE_NUMBER_TO_SEND_ALERT"; // Replace with recipient phone number
+  char message[] = "Vehicle theft detected!"; // Message content
+  sms.beginSMS(remoteNum);
+  sms.print(message);
+  sms.endSMS();
+  Serial.println("Alert message sent");
+}
